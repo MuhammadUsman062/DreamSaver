@@ -15,6 +15,11 @@ pipeline {
                 git branch: 'master', url: env.GITHUB_REPO
             }
         }
+        stage('Verify Docker') {
+            steps {
+                sh 'docker --version'
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 script {
@@ -22,11 +27,7 @@ pipeline {
                 }
             }
         }
-        stage('Verify Docker') {
-            steps {
-                sh 'docker --version'
-            }
-        }
+        
         stage('Run Container') {
             steps {
                 sh 'docker run -d -p 3000:3000 --name dreamsaver_container DreamSaver'
