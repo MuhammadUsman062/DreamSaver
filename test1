@@ -1,0 +1,21 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import time
+
+def test_home_page():
+    
+
+  
+    driver.get("http://44.201.156.7:3000")
+
+   
+    time.sleep(5)
+
+    
+    assert driver.title == "DreamSaver", f"Title was {driver.title}"
+
+   
+    driver.quit()
+
+if __name__ == "__main__":
+    test_home_page()
