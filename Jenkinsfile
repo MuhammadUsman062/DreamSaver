@@ -1,14 +1,10 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'  // Mount Docker socket
-        }
-    }
+    agent any
     environment {
-        DOCKER_IMAGE = 'dreamsaver_image'  // Use lowercase name as Docker requires
-        CONTAINER_NAME = 'dreamsaver_container'
+        CLIENT_IMAGE = 'dreamsaver_client_image'
+        CLIENT_CONTAINER = 'client_container'
         GITHUB_REPO = 'https://github.com/MuhammadUsman062/DreamSaver.git'
+        TEST_REPO = 'https://github.com/YourGitHubUser/SeleniumTests.git'  // Replace with your test repo
     }
     stages {
         stage('Clone Repository') {
@@ -17,42 +13,44 @@ pipeline {
             }
         }
 
-        stage('Verify Docker') {
+        stage('Build Client Image') {
             steps {
-                sh 'docker --version'  // Ensure Docker is available
+                // Build Docker image for the frontend
+                sh "docker build -t ${CLIENT_IMAGE} ."
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                      sh "docker build -t ${CLIENT_IMAGE} ."
-                }
-            }
-        }
-
-        stage('Run Container') {
+        stage('Run Client Container') {
             steps {
                 script {
                     // Stop and remove existing container if it exists
                     sh """
-                        if docker ps -a --filter "name=${CONTAINER_NAME}" | grep -q ${CONTAINER_NAME}; then
-                            docker stop ${CONTAINER_NAME}
-                            docker rm ${CONTAINER_NAME}
-                        fi
+                        docker rm -f ${CLIENT_CONTAINER} || true
                     """
-
-                    // Run the container
-                    sh "docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${DOCKER_IMAGE}"
-
-                    // Verify container is running
+                    // Run the frontend container
                     sh """
-                        if ! docker ps --filter "name=${CONTAINER_NAME}" | grep -q ${CONTAINER_NAME}; then
-                            echo "Container failed to start. Showing logs:"
-                            docker logs ${CONTAINER_NAME}
-                            exit 1
-                        fi
+                        docker run -d -p 3000:3000 --name ${CLIENT_CONTAINER} ${CLIENT_IMAGE}
                     """
+                    // Verify the container is running
+                    sh """
+                        docker ps | grep ${CLIENT_CONTAINER} || (echo 'Container not running' && exit 1)
+                    """
+                }
+            }
+        }
+
+        stage('Run Selenium Tests') {
+            steps {
+                script {
+                    // Clone the Selenium test repository
+                    git branch: 'main', url: env.TEST_REPO
+
+                    // Install required Python dependencies
+                    sh 'pip3 install -r requirements.txt'
+
+                    // Run Selenium tests using Python
+                    sh 'python3 test_home_page.py'
+                    sh 'python3 test_button_presence.py'
                 }
             }
         }
@@ -60,22 +58,10 @@ pipeline {
         stage('Verify Access') {
             steps {
                 script {
-                    // Validate port is open
                     sh """
-                        if ! sudo netstat -tuln | grep -q ':3000'; then
-                            echo "Port 3000 is not open. Check container and firewall settings."
-                            exit 1
-                        fi
+                        netstat -tuln | grep -q ':3000' || (echo 'Port 3000 not open' && exit 1)
                     """
-                    echo "Web application should be accessible at http://<EC2-public-IP>:3000"
-                }
-            }
-        }
-
-        stage('Cleanup') {
-            steps {
-                script {
-                    sh "docker rmi ${DOCKER_IMAGE} || true"  // Clean up image if needed
+                    echo "Client application should be accessible at: http://<EC2-public-IP>:3000"
                 }
             }
         }
