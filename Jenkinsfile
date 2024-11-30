@@ -12,19 +12,19 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'master', url: "https://github.com/MuhammadUsman062/DreamSaver.git"
+                git branch: 'master', url: env.GITHUB_REPO
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("DreamSaver")
+                    docker.build("${DOCKER_IMAGE}", ".")
                 }
             }
         }
         stage('Run Container') {
             steps {
-                sh 'docker run -d -p 3000:3000 DreamSaver'
+                sh 'docker run -d -p 3000:4000 --name dreamsaver_container DreamSaver'
             }
         }
     }
