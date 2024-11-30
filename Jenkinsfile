@@ -22,6 +22,11 @@ pipeline {
                 }
             }
         }
+        stage('Verify Docker') {
+            steps {
+                sh 'docker --version'
+            }
+        }
         stage('Run Container') {
             steps {
                 sh 'docker run -d -p 3000:3000 --name dreamsaver_container DreamSaver'
