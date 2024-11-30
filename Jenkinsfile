@@ -25,7 +25,8 @@ pipeline {
             steps {
                 script {
                     // Build Docker image with the name defined in the environment
-                    docker.build("${DOCKER_IMAGE}", ".")
+                    // Ensure that the Dockerfile is at the root or specify the correct path
+                    docker.build("${DOCKER_IMAGE}", ".")  // Assuming Dockerfile is in the root of the repository
                 }
             }
         }
