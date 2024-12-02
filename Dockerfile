@@ -1,4 +1,5 @@
-FROM node:16-slim
+FROM node: 18-slim
+
 
 # Set the working directory in the container
 WORKDIR /client
