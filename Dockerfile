@@ -8,7 +8,7 @@ COPY ./client/package*.json ./
 
 
 # Install app dependencies
-RUN npm install
+RUN npm ci
 
 # Copy the rest of the application code
 COPY client/ .
