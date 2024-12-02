@@ -4,7 +4,8 @@ FROM node:18
 WORKDIR /client
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+COPY ./client/package*.json ./
+
 
 # Install app dependencies
 RUN npm install
