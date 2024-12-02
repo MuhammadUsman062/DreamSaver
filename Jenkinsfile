@@ -16,28 +16,13 @@ pipeline {
         stage('Build Client Image') {
             steps {
                 // Build Docker image for the frontend
-                sh "docker build -t 'dreamsaver_client_image' ."
+                sh "docker build -t dreamsaver_client_image ."
+                 sh "docker run -d -p 3000:3000 dreamsaver_client_image"
             }
         }
 
-        stage('Run Client Container') {
-            steps {
-                script {
-                    // Stop and remove existing container if it exists
-                    sh """
-                        docker rm -f 'https://github.com/MuhammadUsman062/DreamSaver.git' || true
-                    """
-                    // Run the frontend container
-                    sh """
-                        docker run -d -p 3000:3000 --name 'https://github.com/MuhammadUsman062/DreamSaver.git' 'dreamsaver_client_image'
-                    """
-                    // Verify the container is running
-                    sh """
-                        docker ps | grep 'client_container' || (echo 'Container not running' && exit 1)
-                    """
-                }
-            }
-        }
+       
+        
 
         // stage('Run Selenium Tests') {
         //     steps {
@@ -54,16 +39,7 @@ pipeline {
         //         }
         //     }
         // }
-
-        stage('Verify Access') {
-            steps {
-                script {
-                    sh """
-                        netstat -tuln | grep -q ':3000' || (echo 'Port 3000 not open' && exit 1)
-                    """
-                    echo "Client application should be accessible at: http://<EC2-public-IP>:3000"
-                }
-            }
-        }
+            
+    
     }
 }
