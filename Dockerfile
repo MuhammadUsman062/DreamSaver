@@ -6,12 +6,11 @@ WORKDIR /client
 # Copy package.json and package-lock.json
 COPY ./client/package*.json ./
 
+# Copy the rest of the application code
+COPY client/ .
 
 # Install app dependencies
 RUN npm ci
-
-# Copy the rest of the application code
-COPY client/ .
 
 # Build the app
 RUN npm run build
