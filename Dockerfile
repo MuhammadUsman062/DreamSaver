@@ -11,7 +11,7 @@ COPY ./client/package*.json ./
 COPY client/ .
 
 # Install app dependencies
-RUN npm ci
+RUN npm install
 
 # Build the app
 RUN npm run build
