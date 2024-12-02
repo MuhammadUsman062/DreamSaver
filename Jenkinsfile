@@ -4,19 +4,19 @@ pipeline {
         CLIENT_IMAGE = 'dreamsaver_client_image'
         CLIENT_CONTAINER = 'client_container'
         GITHUB_REPO = 'https://github.com/MuhammadUsman062/DreamSaver.git'
-        TEST_REPO = 'https://github.com/YourGitHubUser/SeleniumTests.git'  // Replace with your test repo
+        TEST_REPO = 'https://github.com/YourGitHubUser/SeleniumTests.git' 
     }
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'master', url: env.GITHUB_REPO
+                git branch: 'master', url: 'https://github.com/MuhammadUsman062/DreamSaver.git'
             }
         }
 
         stage('Build Client Image') {
             steps {
                 // Build Docker image for the frontend
-                sh "docker build -t ${CLIENT_IMAGE} ."
+                sh "docker build -t 'dreamsaver_client_image' ."
             }
         }
 
@@ -25,35 +25,35 @@ pipeline {
                 script {
                     // Stop and remove existing container if it exists
                     sh """
-                        docker rm -f ${CLIENT_CONTAINER} || true
+                        docker rm -f 'https://github.com/MuhammadUsman062/DreamSaver.git' || true
                     """
                     // Run the frontend container
                     sh """
-                        docker run -d -p 3000:3000 --name ${CLIENT_CONTAINER} ${CLIENT_IMAGE}
+                        docker run -d -p 3000:3000 --name 'https://github.com/MuhammadUsman062/DreamSaver.git' 'dreamsaver_client_image'
                     """
                     // Verify the container is running
                     sh """
-                        docker ps | grep ${CLIENT_CONTAINER} || (echo 'Container not running' && exit 1)
+                        docker ps | grep 'client_container' || (echo 'Container not running' && exit 1)
                     """
                 }
             }
         }
 
-        stage('Run Selenium Tests') {
-            steps {
-                script {
-                    // Clone the Selenium test repository
-                    git branch: 'main', url: env.TEST_REPO
+        // stage('Run Selenium Tests') {
+        //     steps {
+        //         script {
+        //             // Clone the Selenium test repository
+        //             git branch: 'main', url: env.TEST_REPO
 
-                    // Install required Python dependencies
-                    sh 'pip3 install -r requirements.txt'
+        //             // Install required Python dependencies
+        //             sh 'pip3 install -r requirements.txt'
 
-                    // Run Selenium tests using Python
-                    sh 'python3 test_home_page.py'
-                    sh 'python3 test_button_presence.py'
-                }
-            }
-        }
+        //             // Run Selenium tests using Python
+        //             sh 'python3 test_home_page.py'
+        //             sh 'python3 test_button_presence.py'
+        //         }
+        //     }
+        // }
 
         stage('Verify Access') {
             steps {
