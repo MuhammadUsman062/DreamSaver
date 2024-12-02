@@ -13,8 +13,6 @@ COPY client/ .
 # Install app dependencies
 RUN npm install
 
-# Build the app
-RUN npm run build
 
 # Expose the port on which the app will run
 EXPOSE 3000
